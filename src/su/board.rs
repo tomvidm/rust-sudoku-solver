@@ -72,18 +72,20 @@ impl Board {
         }
     }
 
-    pub fn new_from_array(array: [[i8; 9]; 9]) -> Board {
+    pub fn new_from_array(array: [[i8; 9]; 9]) -> Option<Board> {
         let mut board = Board::new();
         for r in 0..9 {
             for c in 0..9 {
                 let val = array[r as usize][c as usize];
                 let coord = Coord::new(r, c);
                 let entry = Move::new(r, c, val);
-                board.put_if_legal(entry);
+                if !board.put_if_legal(entry) {
+                    return None
+                }
             }
         }
 
-        return board;
+        return Some(board)
     }
 
     fn set_val(&mut self, coord: Coord, val: i8) {
@@ -174,9 +176,12 @@ impl Board {
         }
     }
 
-    fn put_if_legal(&mut self, entry: Move) {
+    fn put_if_legal(&mut self, entry: Move) -> bool {
         if self.is_move_legal(entry) {
             self.disallow_and_allow_old(entry.coord, entry.new_value);
+            return true
+        } else {
+            return false
         }
     }
 }
